@@ -6,11 +6,6 @@ from .models import AppUser
 from .serializers import AppUserSerializer, AppUserRegistrationSerializer
 
 # Create your views here.
-class HelloWorldViewSet(APIView):
-
-    def get(self, request):
-        return Response("hello world")
-
 class AppUserViewSet(ModelViewSet):
     queryset = AppUser.objects.all()
     serializer_class = AppUserSerializer
