@@ -44,7 +44,7 @@ class UserManager(BaseUserManager):
 class AppUser(AbstractUser):
     username = None
     email = EmailField(unique=True)
-    user_id = UUIDField(primary_key=True, default=uuid4())
+    user_id = UUIDField(primary_key=True, default=uuid4)
     phone_number = CharField()
 
     USERNAME_FIELD = "email"

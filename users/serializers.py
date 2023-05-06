@@ -7,7 +7,7 @@ from .models import AppUser
 class AppUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppUser
-        fields = ['id', 'email', 'first_name', 'last_name', 'is_active', 'is_staff']
+        fields = ['user_id', 'email', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_staff']
 
 class AppUserRegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField()

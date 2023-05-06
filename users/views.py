@@ -1,4 +1,6 @@
-from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
+from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,12 +20,22 @@ class AppUserViewSet(ModelViewSet):
         serializer = AppUserRegistrationSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            self.queryset.create(**serializer.validated_data)
-            return Response("YES")
+            UserModel = get_user_model()
 
-        # return Response(request.data)
-    
+            try:
+                user = UserModel.objects.create_user(serializer.validated_data.get("email"), serializer.validated_data.get("password"))
+            except IntegrityError as err:
+                return Response(str(err.__cause__), status=status.HTTP_409_CONFLICT)
+            
+            user.first_name = serializer.validated_data.get("first_name")
+            user.last_name = serializer.validated_data.get("last_name")
+            user.phone_number = serializer.validated_data.get("phone_number")
+            user.save()
+
+            response = self.serializer_class(user)
+            return Response(response.data, status=status.HTTP_201_CREATED)
+
     @action(methods=['get'], detail=True)
-    def user(self, request, pk=None):
-        serializer = self.serializer_class(self.queryset.get(id=pk))
-        return Response(serializer.data)
+    def details(self, request, pk=None):
+        serializer = self.serializer_class(self.queryset.get(user_id=pk))
+        return Response(serializer.data, status=status.HTTP_200_OK)
