@@ -5,7 +5,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import AppUser
-from .serializers import AppUserSerializer, AppUserRegistrationSerializer
+from .serializers import AppUserSerializer, AppUserRegistrationSerializer, LoginSerializer
+from django.contrib.auth import authenticate
 
 # Create your views here.
 class AppUserViewSet(ModelViewSet):
@@ -34,6 +35,19 @@ class AppUserViewSet(ModelViewSet):
 
             response = self.serializer_class(user)
             return Response(response.data, status=status.HTTP_201_CREATED)
+        
+    @action(methods=["post"], detail=False)
+    # TODO: REPLACE THIS WITH DJANGO'S AUTHTOKEN AUTHENTICATION
+    def login(self, request):
+        serializer = LoginSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(email=serializer.validated_data.get("email"), password=serializer.validated_data.get("password"))
+
+        if not user:
+            return Response("Error signing in", status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response("Successfully signed in", status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True)
     def details(self, request, pk=None):
