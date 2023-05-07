@@ -27,3 +27,13 @@ poetry shell
     ```
     exit
     ```
+
+## Applying Database Migrations
+```
+python manage.py migrate
+```
+
+## Running the API Locally
+```
+python manage.py runserver
+```
