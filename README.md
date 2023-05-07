@@ -18,3 +18,12 @@
 ```
 poetry install
 ```
+
+## Activate Python Virtual Environment
+```
+poetry shell
+```
+- Exit with
+    ```
+    exit
+    ```
