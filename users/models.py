@@ -1,7 +1,6 @@
 from uuid import uuid4
 
-from django.db import models
-from django.db.models.fields import UUIDField, CharField, EmailField, BooleanField
+from django.db.models.fields import UUIDField, CharField, EmailField
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 # Create your models here.

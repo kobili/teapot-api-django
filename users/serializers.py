@@ -14,6 +14,3 @@ class AppUserRegistrationSerializer(serializers.Serializer):
     password = serializers.CharField()
     phone_number = serializers.CharField()
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()

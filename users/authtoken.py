@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 class EmailAuthTokenSerializer(AuthTokenSerializer):
     """
     Extends rest_framework.authtoken's AuthTokenSerializer,
-    but replaces username with email
+    but replaces username signin with email
     """
     email = serializers.EmailField(
         label=_("Email"),
