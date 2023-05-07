@@ -38,5 +38,9 @@ class AppUserViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=True)
     def details(self, request, pk=None):
-        serializer = self.serializer_class(self.queryset.get(user_id=pk))
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            user = self.queryset.get(user_id=pk)
+            serializer = self.serializer_class(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except AppUser.DoesNotExist:
+            return Response("Could not find user with id {}".format(pk), status=status.HTTP_404_NOT_FOUND)
