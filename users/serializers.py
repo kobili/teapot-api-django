@@ -7,7 +7,7 @@ class AppUserSerializer(serializers.ModelSerializer):
         model = AppUser
         fields = ['user_id', 'email', 'first_name', 'last_name', 'phone_number', 'is_active', 'is_staff']
 
-class AppUserRegistrationSerializer(serializers.Serializer):
+class RegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()

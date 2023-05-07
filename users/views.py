@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import AppUser
-from .serializers import AppUserSerializer, AppUserRegistrationSerializer
+from .serializers import AppUserSerializer, RegistrationSerializer
 
 
 # Create your views here.
@@ -18,7 +18,7 @@ class AppUserViewSet(ModelViewSet):
     
     @action(methods=["post"], detail=False)
     def register(self, request):
-        serializer = AppUserRegistrationSerializer(data=request.data)
+        serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             UserModel = get_user_model()
