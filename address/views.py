@@ -14,7 +14,7 @@ class AddressViewSet(GenericViewSet):
     def get_queryset(self):
         return self.queryset
     
-    def create(self, request, user_id):
+    def create(self, request, user_id=None):
         UserModel = get_user_model()
 
         user = UserModel.objects.get(user_id=user_id, is_active=True)
@@ -27,9 +27,7 @@ class AddressViewSet(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        address = self.get_queryset().create(**serializer.validated_data)
-        address.app_user = user
-        address.save()
+        self.get_queryset().create(app_user=user, **serializer.validated_data)
 
         return Response(
             serializer.validated_data,
