@@ -6,6 +6,7 @@ from .models import Address
 from .serializers import AddressSerializer
 
 from utils.fetchers import get_user_by_id
+from utils.error_responses import user_not_found_response
 
 
 # Create your views here.
@@ -19,10 +20,7 @@ class AddressViewSet(GenericViewSet):
     def create(self, request, user_id=None):
         user = get_user_by_id(user_id)
         if not user:
-            return Response(
-                {"error": "Could not find user {}".format(user_id)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return user_not_found_response(user_id)
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -37,10 +35,7 @@ class AddressViewSet(GenericViewSet):
     def retrieve(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
         if not user:
-            return Response(
-                {"error": f"Could not find user {user_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return user_not_found_response(user_id)
         
         try:
             address = self.queryset.get(app_user=user, address_id=pk)
@@ -58,10 +53,7 @@ class AddressViewSet(GenericViewSet):
     def list(self, request, user_id=None):
         user = get_user_by_id(user_id)
         if not user:
-            return Response(
-                {"error": "Could not find user {}".format(user_id)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return user_not_found_response(user_id)
         
         addresses = self.get_queryset().filter(app_user=user)
 
@@ -69,3 +61,8 @@ class AddressViewSet(GenericViewSet):
             self.serializer_class(addresses, many=True).data,
             status=status.HTTP_200_OK,
         )
+    
+    def update(self, request, user_id=None):
+        user = get_user_by_id(user_id)
+        if not user:
+            return user_not_found_response(user_id)
