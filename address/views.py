@@ -36,14 +36,10 @@ class AddressViewSet(GenericViewSet):
         user = get_user_by_id(user_id)
         if not user:
             return user_not_found_response(user_id)
-        
-        try:
-            address = self.queryset.get(app_user=user, address_id=pk)
-        except Address.DoesNotExist:
-            return Response(
-                {"error": "Could not find address with id {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+
+        address = self._get_user_address_by_id(app_user=user, address_id=pk)
+        if not address:
+            return self._address_not_found_response(pk)
         
         return Response(
             self.serializer_class(address).data,
@@ -62,7 +58,32 @@ class AddressViewSet(GenericViewSet):
             status=status.HTTP_200_OK,
         )
     
-    def update(self, request, user_id=None):
+    def update(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
         if not user:
             return user_not_found_response(user_id)
+        
+        address = self._get_user_address_by_id(app_user=user, address_id=pk)
+        if not address:
+            return self._address_not_found_response(address_id=pk)
+        
+        serializer = self.serializer_class(address, request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+        
+    def _get_user_address_by_id(self, app_user=None, address_id=None):
+        try:
+            return self.queryset.get(app_user=app_user, address_id=address_id)
+        except Address.DoesNotExist:
+            return None
+        
+    def _address_not_found_response(self, address_id=None):
+        return Response(
+            {"error": f"Could not find address {address_id}"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
