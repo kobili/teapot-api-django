@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
@@ -38,7 +39,7 @@ class AppUserViewSet(GenericViewSet, RetrieveModelMixin):
         response = self.serializer_class(user)
         return Response(response.data, status=status.HTTP_201_CREATED)
 
-    # PUT users/{user_id}
+    # PUT users/{user_id}/
     def update(self, request, pk=None):
         serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -65,3 +66,32 @@ class AppUserViewSet(GenericViewSet, RetrieveModelMixin):
 
         response = self.serializer_class(user)
         return Response(response.data, status=status.HTTP_200_OK)
+    
+    def destroy(self, request, pk=None):
+        user = self.queryset.get(user_id=pk)
+
+        if not user:
+            return Response(
+                {"error": "Could not find user {}".format(pk)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        user.is_active = False
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(methods=["PUT"], detail=True)
+    def restore(self, request, pk=None):
+        user = self.queryset.get(user_id=pk)
+
+        if not user:
+            return Response(
+                {"error": "Could not find user {}".format(pk)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        user.is_active = True
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
