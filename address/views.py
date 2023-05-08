@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -16,9 +15,7 @@ class AddressViewSet(GenericViewSet):
         return self.queryset
     
     def create(self, request, user_id=None):
-        UserModel = get_user_model()
-
-        user = UserModel.objects.get(user_id=user_id, is_active=True)
+        user = self._get_user(user_id)
         if not user:
             return Response(
                 {"error": "Could not find user {}".format(user_id)},
@@ -36,8 +33,7 @@ class AddressViewSet(GenericViewSet):
         )
     
     def retrieve(self, request, user_id=None, pk=None):
-
-        user = self._get_user(user_id=user_id)
+        user = self._get_user(user_id)
         if not user:
             return Response(
                 {"error": f"Could not find user {user_id}"},
@@ -58,9 +54,7 @@ class AddressViewSet(GenericViewSet):
         )
     
     def list(self, request, user_id=None):
-        UserModel = get_user_model()
-
-        user = UserModel.objects.get(user_id=user_id, is_active=True)
+        user = self._get_user(user_id)
         if not user:
             return Response(
                 {"error": "Could not find user {}".format(user_id)},
