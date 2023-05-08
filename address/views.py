@@ -34,3 +34,20 @@ class AddressViewSet(GenericViewSet, RetrieveModelMixin):
             self.serializer_class(address).data,
             status=status.HTTP_201_CREATED,
         )
+    
+    def list(self, request, user_id=None):
+        UserModel = get_user_model()
+
+        user = UserModel.objects.get(user_id=user_id, is_active=True)
+        if not user:
+            return Response(
+                {"error": "Could not find user {}".format(user_id)},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+        addresses = self.get_queryset().filter(app_user=user)
+
+        return Response(
+            self.serializer_class(addresses, many=True).data,
+            status=status.HTTP_200_OK,
+        )
