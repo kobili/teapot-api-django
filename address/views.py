@@ -1,10 +1,12 @@
-from django.contrib.auth import get_user_model
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Address
 from .serializers import AddressSerializer
+
+from utils.fetchers import get_user_by_id
+
 
 # Create your views here.
 class AddressViewSet(GenericViewSet):
@@ -15,7 +17,7 @@ class AddressViewSet(GenericViewSet):
         return self.queryset
     
     def create(self, request, user_id=None):
-        user = self._get_user(user_id)
+        user = get_user_by_id(user_id)
         if not user:
             return Response(
                 {"error": "Could not find user {}".format(user_id)},
@@ -33,7 +35,7 @@ class AddressViewSet(GenericViewSet):
         )
     
     def retrieve(self, request, user_id=None, pk=None):
-        user = self._get_user(user_id)
+        user = get_user_by_id(user_id)
         if not user:
             return Response(
                 {"error": f"Could not find user {user_id}"},
@@ -54,7 +56,7 @@ class AddressViewSet(GenericViewSet):
         )
     
     def list(self, request, user_id=None):
-        user = self._get_user(user_id)
+        user = get_user_by_id(user_id)
         if not user:
             return Response(
                 {"error": "Could not find user {}".format(user_id)},
@@ -67,11 +69,3 @@ class AddressViewSet(GenericViewSet):
             self.serializer_class(addresses, many=True).data,
             status=status.HTTP_200_OK,
         )
-    
-    def _get_user(self, user_id=None):
-        UserModel = get_user_model()
-
-        try:
-            return UserModel.objects.get(user_id=user_id, is_active=True)
-        except UserModel.DoesNotExist:
-            return None
