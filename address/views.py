@@ -5,8 +5,7 @@ from rest_framework import status
 from .models import Address
 from .serializers import AddressSerializer
 
-from utils.fetchers import get_user_by_id
-from utils.error_responses import user_not_found_response
+from users.utils import get_user_by_id, user_not_found_response
 
 
 # Create your views here.
