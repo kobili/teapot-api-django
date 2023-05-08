@@ -17,10 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from users.urls import urlpatterns as user_urls
-from users.authtoken import obtain_auth_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('signin/', obtain_auth_token),
     path('', include(user_urls))
 ]
