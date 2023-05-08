@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -7,7 +8,7 @@ from .models import Address
 from .serializers import AddressSerializer
 
 # Create your views here.
-class AddressViewSet(GenericViewSet):
+class AddressViewSet(GenericViewSet, RetrieveModelMixin):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
@@ -27,9 +28,9 @@ class AddressViewSet(GenericViewSet):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        self.get_queryset().create(app_user=user, **serializer.validated_data)
+        address = self.get_queryset().create(app_user=user, **serializer.validated_data)
 
         return Response(
-            serializer.validated_data,
+            self.serializer_class(address).data,
             status=status.HTTP_201_CREATED,
         )
