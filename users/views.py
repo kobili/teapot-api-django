@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import AppUser
 from .serializers import AppUserSerializer, RegistrationSerializer, UpdateUserSerializer

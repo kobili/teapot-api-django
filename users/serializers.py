@@ -1,5 +1,4 @@
 from rest_framework import serializers
-# from django.db.models.fields import EmailField, CharField
 from .models import AppUser
 
 class AppUserSerializer(serializers.ModelSerializer):
