@@ -95,3 +95,33 @@ class AppUserViewSet(GenericViewSet, RetrieveModelMixin):
         user.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(methods=["PUT"], detail=True)
+    def promote(self, request, pk=None):
+        user = self.queryset.get(user_id=pk)
+
+        if not user:
+            return Response(
+                {"error": "Could not find user {}".format(pk)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        user.is_staff = True
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(methods=["PUT"], detail=True)
+    def demote(self, request, pk=None):
+        user = self.queryset.get(user_id=pk)
+
+        if not user:
+            return Response(
+                {"error": "Could not find user {}".format(pk)},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        user.is_staff = False
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
