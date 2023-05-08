@@ -14,3 +14,8 @@ class RegistrationSerializer(serializers.Serializer):
     password = serializers.CharField()
     phone_number = serializers.CharField()
 
+class UpdateUserSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    phone_number = serializers.CharField()
