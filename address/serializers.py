@@ -5,6 +5,7 @@ class AddressSerializer(ModelSerializer):
     class Meta:
         model = Address
         fields = [
+            "address_id",
             "first_name",
             "last_name",
             "address_line_1",
