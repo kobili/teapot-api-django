@@ -7,7 +7,7 @@ class EmailBackend(ModelBackend):
         UserModel = get_user_model()
 
         try:
-            user = UserModel.objects.get(email=email)
+            user = UserModel.objects.get(email=email, is_active=True)
         except UserModel.DoesNotExist:
             return None
         else:
