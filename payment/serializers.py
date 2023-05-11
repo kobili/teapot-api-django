@@ -9,5 +9,6 @@ class PaymentInfoSerializer(serializers.ModelSerializer):
             'payment_id',
             'card_number',
             'expiry_date',
+            'cvv',
             'card_holder',
         ]
