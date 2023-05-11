@@ -16,8 +16,6 @@ class PaymentInfoViewset(GenericViewSet):
 
     def create(self, request, user_id=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
         
         serializer = self.serializer_class(data=request.data)
 
@@ -32,8 +30,6 @@ class PaymentInfoViewset(GenericViewSet):
     
     def update(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
         
         serializer = self.serializer_class(data=request.data)
 
