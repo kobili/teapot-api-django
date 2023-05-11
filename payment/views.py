@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import PaymentInfo
 from .serializers import PaymentInfoSerializer
 from users.utils import get_user_by_id
+from .exceptions import PaymentInfoNotFoundException
 
 # Create your views here.
 class PaymentInfoViewset(GenericViewSet):
@@ -34,13 +35,7 @@ class PaymentInfoViewset(GenericViewSet):
 
         serializer.is_valid(raise_exception=True)
 
-        try:
-            payment = self.queryset.get(app_user=user, payment_id=pk)
-        except PaymentInfo.DoesNotExist:
-            return Response(
-                {"error": f"Could not find payment method {pk}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        payment = self._get_user_payment_by_id(user, pk)
         
         serializer = self.serializer_class(payment, request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,3 +45,17 @@ class PaymentInfoViewset(GenericViewSet):
             serializer.data,
             status=status.HTTP_200_OK,
         )
+    
+    def destroy(self, request, user_id=None, pk=None):
+        user = get_user_by_id(user_id)
+        payment = self._get_user_payment_by_id(user, pk)
+
+        payment.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+    def _get_user_payment_by_id(self, user, payment_id=None):
+        try:
+            return self.queryset.get(app_user=user, payment_id=payment_id)
+        except PaymentInfo.DoesNotExist:
+            raise PaymentInfoNotFoundException(payment_id)
