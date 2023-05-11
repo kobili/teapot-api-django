@@ -1,10 +1,9 @@
-from django.shortcuts import render
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from .models import PaymentInfo
 from .serializers import PaymentInfoSerializer
-from users.utils import get_user_by_id, user_not_found_response
+from users.utils import get_user_by_id
 
 # Create your views here.
 class PaymentInfoViewset(GenericViewSet):
