@@ -4,8 +4,9 @@ from rest_framework import status
 
 from .models import Address
 from .serializers import AddressSerializer
+from .exceptions import AddressNotFoundException
 
-from users.utils import get_user_by_id, user_not_found_response
+from users.utils import get_user_by_id
 
 
 # Create your views here.
@@ -18,8 +19,6 @@ class AddressViewSet(GenericViewSet):
 
     def create(self, request, user_id=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -33,12 +32,8 @@ class AddressViewSet(GenericViewSet):
 
     def retrieve(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
 
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
-        if not address:
-            return self._address_not_found_response(pk)
 
         return Response(
             self.serializer_class(address).data,
@@ -47,8 +42,6 @@ class AddressViewSet(GenericViewSet):
 
     def list(self, request, user_id=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
         
         addresses = self.get_queryset().filter(app_user=user)
 
@@ -59,12 +52,8 @@ class AddressViewSet(GenericViewSet):
 
     def update(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
         
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
-        if not address:
-            return self._address_not_found_response(address_id=pk)
         
         serializer = self.serializer_class(address, request.data)
         serializer.is_valid(raise_exception=True)
@@ -77,12 +66,8 @@ class AddressViewSet(GenericViewSet):
 
     def destroy(self, request, user_id=None, pk=None):
         user = get_user_by_id(user_id)
-        if not user:
-            return user_not_found_response(user_id)
         
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
-        if not address:
-            return self._address_not_found_response(address_id=pk)
         
         address.delete()
 
@@ -92,10 +77,4 @@ class AddressViewSet(GenericViewSet):
         try:
             return self.queryset.get(app_user=app_user, address_id=address_id)
         except Address.DoesNotExist:
-            return None
-
-    def _address_not_found_response(self, address_id=None):
-        return Response(
-            {"error": f"Could not find address {address_id}"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
+            raise AddressNotFoundException(address_id)
