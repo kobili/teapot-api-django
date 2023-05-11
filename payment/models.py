@@ -9,4 +9,5 @@ class PaymentInfo(models.Model):
     card_number = encrypt(models.CharField())
     expiry_date = encrypt(models.CharField())
     card_holder = encrypt(models.CharField())
+    cvv = encrypt(models.CharField())
     app_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="payment_methods")
