@@ -19,10 +19,12 @@ from django.urls import path, include
 from users.urls import urlpatterns as user_urls
 from address.urls import urlpatterns as address_urls
 from payment.urls import urlpatterns as payment_urls
+from banking.urls import urlpatterns as banking_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(user_urls)),
     path('', include(address_urls)),
     path('', include(payment_urls)),
+    path('', include(banking_urls)),
 ]
