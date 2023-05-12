@@ -2,10 +2,13 @@ from rest_framework import serializers
 from .models import AppUser
 from address.serializers import AddressSerializer
 from payment.serializers import PaymentInfoSerializer
+from banking.serializers import BankingInfoSerializer
+
 
 class AppUserSerializer(serializers.ModelSerializer):
     addresses = AddressSerializer(many=True, required=False)
     payment_methods = PaymentInfoSerializer(many=True, required=False)
+    banking_infos = BankingInfoSerializer(many=True, required=False)
 
     class Meta:
         model = AppUser
@@ -19,6 +22,7 @@ class AppUserSerializer(serializers.ModelSerializer):
             'is_staff',
             'addresses',
             'payment_methods',
+            'banking_infos',
         ]
 
 class RegistrationSerializer(serializers.Serializer):
