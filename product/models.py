@@ -13,5 +13,5 @@ class Product(models.Model):
     stock = models.IntegerField()
     is_available = models.BooleanField(default=True)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="products")
-    category = models.ForeignKey(Category)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
