@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.db import models
+from django.utils.functional import cached_property
 
 from teapot_api import settings
 from category.models import Category
@@ -14,4 +15,11 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="products")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+
+    @cached_property
+    def seller(self):
+        return {
+            "seller_id": self.user.user_id,
+            "name": f"{self.user.first_name} {self.user.last_name}",
+        }
