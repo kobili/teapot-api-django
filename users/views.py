@@ -44,15 +44,17 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
+        try:
+            user = self.queryset.get(user_id=pk)
+        except AppUser.DoesNotExist:
             return Response(
                 {"error": "Could not find user {}".format(pk)},
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        if self.queryset.filter(email=serializer.validated_data.get("email")).exists():
+        email = serializer.validated_data.get("email")
+        
+        if not user.email == email and self.queryset.filter(email=email).exists():
             return Response(
                 {"error": "User with email '{}' already exists".format(serializer.validated_data.get("email"))},
                 status=status.HTTP_400_BAD_REQUEST
