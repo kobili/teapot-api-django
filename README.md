@@ -5,13 +5,17 @@
 - Docker
 
 ## Starting a Postgres DB in a Docker Container
-- Pull the Docker image:
+- Create the containers:
     ```
-    docker pull postgres:14
+    make build
     ```
-- Start the container:
+- Start the containers:
     ```
-    docker run --name some-postgres -e POSTGRES_PASSWORD=password -d -p 5050:5432  postgres:14
+    make start
+    ```
+- Stop the containers:
+    ```
+    make stop
     ```
 
 ## Installing Dependencies
