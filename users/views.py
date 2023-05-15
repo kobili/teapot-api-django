@@ -6,6 +6,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from .models import AppUser
 from .serializers import AppUserSerializer, RegistrationSerializer, UpdateUserSerializer
+from .exceptions import UserNotFoundException
 
 
 # Create your views here.
@@ -44,13 +45,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            user = self.queryset.get(user_id=pk)
-        except AppUser.DoesNotExist:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
         email = serializer.validated_data.get("email")
         
@@ -70,13 +65,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(response.data, status=status.HTTP_200_OK)
     
     def destroy(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
         user.is_active = False
         user.save()
@@ -85,13 +74,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     
     @action(methods=["PUT"], detail=True)
     def restore(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
         user.is_active = True
         user.save()
@@ -100,13 +83,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     
     @action(methods=["PUT"], detail=True)
     def promote(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
         user.is_staff = True
         user.save()
@@ -115,15 +92,15 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
     
     @action(methods=["PUT"], detail=True)
     def demote(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
         user.is_staff = False
         user.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def _get_user_by_id(self, pk=None):
+        try:
+            return self.get_queryset().get(user_id=pk)
+        except AppUser.DoesNotExist:
+            raise UserNotFoundException(user_id=pk)
