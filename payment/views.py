@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractBaseUser
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,7 +15,7 @@ class PaymentInfoViewset(GenericViewSet):
     def get_queryset(self):
         return self.queryset
 
-    def create(self, request, user_id=None):
+    def create(self, request, user_id: str=None):
         user = get_user_by_id(user_id)
         
         serializer = self.serializer_class(data=request.data)
@@ -28,7 +29,7 @@ class PaymentInfoViewset(GenericViewSet):
             status=status.HTTP_201_CREATED,
         )
     
-    def update(self, request, user_id=None, pk=None):
+    def update(self, request, user_id: str=None, pk: str=None):
         user = get_user_by_id(user_id)
         
         serializer = self.serializer_class(data=request.data)
@@ -46,7 +47,7 @@ class PaymentInfoViewset(GenericViewSet):
             status=status.HTTP_200_OK,
         )
     
-    def destroy(self, request, user_id=None, pk=None):
+    def destroy(self, request, user_id: str=None, pk: str=None):
         user = get_user_by_id(user_id)
         payment = self._get_user_payment_by_id(user, pk)
 
@@ -54,7 +55,7 @@ class PaymentInfoViewset(GenericViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
         
-    def _get_user_payment_by_id(self, user, payment_id=None):
+    def _get_user_payment_by_id(self, user: AbstractBaseUser, payment_id: str=None):
         try:
             return self.queryset.get(app_user=user, payment_id=payment_id)
         except PaymentInfo.DoesNotExist:

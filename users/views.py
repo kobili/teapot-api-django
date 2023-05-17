@@ -30,7 +30,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user = UserModel.objects.create_user(serializer.validated_data.get("email"), serializer.validated_data.get("password"))
+        user: AppUser = UserModel.objects.create_user(serializer.validated_data.get("email"), serializer.validated_data.get("password"))
         
         user.first_name = serializer.validated_data.get("first_name")
         user.last_name = serializer.validated_data.get("last_name")
@@ -41,7 +41,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(response.data, status=status.HTTP_201_CREATED)
 
     # PUT users/{user_id}/
-    def update(self, request, pk=None):
+    def update(self, request, pk: str=None):
         serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -64,7 +64,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         response = self.serializer_class(user)
         return Response(response.data, status=status.HTTP_200_OK)
     
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk: str=None):
         user = self._get_user_by_id(pk)
         
         user.is_active = False
@@ -73,7 +73,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def restore(self, request, pk=None):
+    def restore(self, request, pk: str=None):
         user = self._get_user_by_id(pk)
         
         user.is_active = True
@@ -82,7 +82,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def promote(self, request, pk=None):
+    def promote(self, request, pk: str=None):
         user = self._get_user_by_id(pk)
         
         user.is_staff = True
@@ -91,7 +91,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def demote(self, request, pk=None):
+    def demote(self, request, pk: str=None):
         user = self._get_user_by_id(pk)
         
         user.is_staff = False
@@ -99,7 +99,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def _get_user_by_id(self, pk=None):
+    def _get_user_by_id(self, pk: str=None) -> AppUser:
         try:
             return self.get_queryset().get(user_id=pk)
         except AppUser.DoesNotExist:

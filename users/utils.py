@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser
+from .models import AppUser
 from .exceptions import UserNotFoundException
 
 
-def get_user_by_id(user_id=None):
+def get_user_by_id(user_id: str=None) -> AppUser | AbstractBaseUser:
     """
     Attempts to find an active user with the provided ID
     Raises UserNotFoundException if the user does not exist

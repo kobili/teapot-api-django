@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractBaseUser
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +18,7 @@ class AddressViewSet(GenericViewSet):
     def get_queryset(self):
         return self.queryset
 
-    def create(self, request, user_id=None):
+    def create(self, request, user_id: str=None):
         user = get_user_by_id(user_id)
 
         serializer = self.serializer_class(data=request.data)
@@ -30,7 +31,7 @@ class AddressViewSet(GenericViewSet):
             status=status.HTTP_201_CREATED,
         )
 
-    def retrieve(self, request, user_id=None, pk=None):
+    def retrieve(self, request, user_id: str=None, pk: str=None):
         user = get_user_by_id(user_id)
 
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
@@ -40,7 +41,7 @@ class AddressViewSet(GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
-    def list(self, request, user_id=None):
+    def list(self, request, user_id: str=None):
         user = get_user_by_id(user_id)
         
         addresses = self.get_queryset().filter(app_user=user)
@@ -50,7 +51,7 @@ class AddressViewSet(GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
-    def update(self, request, user_id=None, pk=None):
+    def update(self, request, user_id: str=None, pk: str=None):
         user = get_user_by_id(user_id)
         
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
@@ -64,7 +65,7 @@ class AddressViewSet(GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
-    def destroy(self, request, user_id=None, pk=None):
+    def destroy(self, request, user_id: str=None, pk: str=None):
         user = get_user_by_id(user_id)
         
         address = self._get_user_address_by_id(app_user=user, address_id=pk)
@@ -73,7 +74,7 @@ class AddressViewSet(GenericViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def _get_user_address_by_id(self, app_user=None, address_id=None):
+    def _get_user_address_by_id(self, app_user: AbstractBaseUser=None, address_id: str=None):
         try:
             return self.queryset.get(app_user=app_user, address_id=address_id)
         except Address.DoesNotExist:
