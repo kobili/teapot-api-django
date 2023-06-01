@@ -1,8 +1,22 @@
 from rest_framework import serializers
-from .models import Product
+from category.serializers import CategorySerializer
+from .models import Product, Image
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = [
+            "image_id",
+        ]
+
+
+class ProductSerializer(serializers.ModelSerializer):    
+    category_id = serializers.UUIDField(write_only=True)
+    image_count = serializers.IntegerField(write_only=True)
+    category = CategorySerializer(read_only=True)
+    images = ImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -12,16 +26,16 @@ class ProductSerializer(serializers.ModelSerializer):
             'price',
             'stock',
             'category_id',
+            'image_count',
             'seller',
             'category',
+            'images',
         ]
         read_only_fields = [
             'seller',
             'category',
+            'images',
         ]
-        extra_kwargs = {
-            'category_id': {'write-only': True},
-        }
 
 
 class ReducedProductSerializer(serializers.ModelSerializer):
@@ -34,3 +48,11 @@ class ReducedProductSerializer(serializers.ModelSerializer):
             'seller',
         ]
         read_only_fields = fields
+
+
+class CreateProductRequestSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.FloatField()
+    image_count = serializers.IntegerField()
+    category_id = serializers.UUIDField()

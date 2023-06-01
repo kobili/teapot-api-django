@@ -27,4 +27,4 @@ class Product(models.Model):
 
 class Image(models.Model):
     image_id = models.UUIDField(primary_key=True, default=uuid4)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")

@@ -21,6 +21,7 @@ from address.urls import urlpatterns as address_urls
 from payment.urls import urlpatterns as payment_urls
 from banking.urls import urlpatterns as banking_urls
 from category.urls import urlpatterns as category_urls
+from product.urls import urlpatterns as product_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +30,5 @@ urlpatterns = [
     path('', include(payment_urls)),
     path('', include(banking_urls)),
     path('', include(category_urls)),
+    path('', include(product_urls)),
 ]
