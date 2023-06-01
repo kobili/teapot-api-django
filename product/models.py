@@ -23,3 +23,8 @@ class Product(models.Model):
             "seller_id": self.user.user_id,
             "name": f"{self.user.first_name} {self.user.last_name}",
         }
+
+
+class Image(models.Model):
+    image_id = models.UUIDField(primary_key=True, default=uuid4)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
