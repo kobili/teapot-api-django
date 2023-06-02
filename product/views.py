@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -8,10 +9,13 @@ from category.models import Category
 from category.exceptions import CategoryNotFoundException
 
 from .models import Product, Image
-from .serializers import ProductSerializer, CreateProductRequestSerializer
+from .serializers import ProductSerializer, ReducedProductSerializer, CreateProductRequestSerializer
 
 
-class ProductViewSet(GenericViewSet):
+class UserProductViewSet(GenericViewSet):
+    """
+    View set to handle requests from /users/<user_id>/product/
+    """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -44,3 +48,20 @@ class ProductViewSet(GenericViewSet):
         response_serializer = ProductSerializer(instance=new_product)
 
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
+
+class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        # TODO: add product filtering here somehow
+        return self.queryset
+    
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReducedProductSerializer
+        # if self.action == "retrieve":
+            # return ProductSerializer
+        return ProductSerializer
+    
+    

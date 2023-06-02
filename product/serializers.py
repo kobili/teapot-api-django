@@ -53,7 +53,6 @@ class ReducedProductSerializer(serializers.ModelSerializer):
             'price',
             'seller',
         ]
-        read_only_fields = fields
 
 
 class CreateProductRequestSerializer(serializers.Serializer):
