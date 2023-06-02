@@ -37,6 +37,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'seller',
             'category',
             'images',
+            'is_available',
         ]
 
 
