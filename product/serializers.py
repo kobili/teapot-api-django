@@ -15,12 +15,14 @@ class ImageSerializer(serializers.ModelSerializer):
         ]
 
     def get_presigned_url(self, obj):
+        # TODO: Fetch presigned urls from here
         return f"This will become a presigned url from s3 for the image {obj.image_id}"
 
 
-class ProductSerializer(serializers.ModelSerializer):    
-    category_id = serializers.UUIDField(write_only=True)
-    image_count = serializers.IntegerField(write_only=True)
+class ProductSerializer(serializers.ModelSerializer):
+    """
+    The main serializer for returning all of a Product's details in an API response
+    """
     category = CategorySerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
 
@@ -32,13 +34,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'description',
             'price',
             'stock',
-            'category_id',
-            'image_count',
-            'seller',
-            'category',
-            'images',
-        ]
-        read_only_fields = [
             'seller',
             'category',
             'images',
@@ -46,6 +41,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ReducedProductSerializer(serializers.ModelSerializer):
+    """
+    The serializer to be used when returning a limited amount of data for a Product
+    """
     class Meta:
         model = Product
         fields = [
@@ -61,5 +59,6 @@ class CreateProductRequestSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.FloatField()
+    stock = serializers.IntegerField()
     image_count = serializers.IntegerField()
     category_id = serializers.UUIDField()

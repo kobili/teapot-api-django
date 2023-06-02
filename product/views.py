@@ -21,26 +21,26 @@ class ProductViewSet(GenericViewSet):
     def create(self, request, user_id: str = None):
         user = get_user_by_id(user_id)
 
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        request_serializer = CreateProductRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
 
-        category_id = serializer.validated_data.pop("category_id")
-        num_images = serializer.validated_data.pop("image_count")
+        category_id = request_serializer.validated_data.pop("category_id")
+        num_images = request_serializer.validated_data.pop("image_count")
 
         category = Category.objects.filter(category_id=category_id).first()
 
         if not category:
-            raise CategoryNotFoundException(serializer.validated_data.get("category_id"))
+            raise CategoryNotFoundException(request_serializer.validated_data.get("category_id"))
         
         new_product = Product.objects.create(
             user=user,
             category=category,
-            **serializer.validated_data,
+            **request_serializer.validated_data,
         )
 
         for _ in range(0, num_images):
             Image.objects.create(product=new_product)
 
-        serializer = ProductSerializer(instance=new_product)
+        response_serializer = ProductSerializer(instance=new_product)
 
-        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
