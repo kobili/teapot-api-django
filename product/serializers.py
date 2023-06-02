@@ -4,11 +4,18 @@ from .models import Product, Image
 
 
 class ImageSerializer(serializers.ModelSerializer):
+
+    presigned_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Image
         fields = [
             "image_id",
+            "presigned_url"
         ]
+
+    def get_presigned_url(self, obj):
+        return f"This will become a presigned url from s3 for the image {obj.image_id}"
 
 
 class ProductSerializer(serializers.ModelSerializer):    
