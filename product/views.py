@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.response import Response
@@ -7,9 +6,14 @@ from rest_framework import status
 from users.utils import get_user_by_id
 from category.models import Category
 from category.exceptions import CategoryNotFoundException
+from category.utils import get_category_by_id
 
 from .models import Product, Image
-from .serializers import ProductSerializer, ReducedProductSerializer, CreateProductRequestSerializer
+from .serializers import (
+    ProductSerializer,
+    ReducedProductSerializer,
+    CreateProductRequestSerializer,
+)
 
 
 class UserProductViewSet(GenericViewSet):
@@ -49,19 +53,32 @@ class UserProductViewSet(GenericViewSet):
 
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
 
+
 class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
     def get_queryset(self, *args, **kwargs):
         # TODO: add product filtering here somehow
-        return self.queryset
+        queryset = Product.objects.all()
+
+        name = self.request.query_params.get("name")
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        category_id = self.request.query_params.get("category")
+        if category_id:
+            category = get_category_by_id(category_id)
+            queryset = queryset.filter(category=category)
+
+        seller_id = self.request.query_params.get("seller")
+        if seller_id:
+            seller = get_user_by_id(seller_id)
+            queryset = queryset.filter(user=seller)
+
+        return queryset
     
     def get_serializer_class(self):
         if self.action == "list":
             return ReducedProductSerializer
-        # if self.action == "retrieve":
-            # return ProductSerializer
         return ProductSerializer
-    
-    
