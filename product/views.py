@@ -59,7 +59,7 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
     serializer_class = ProductSerializer
 
     def get_queryset(self, *args, **kwargs):
-        queryset = Product.objects.all()
+        queryset = Product.objects.filter(is_available=True)
 
         name = self.request.query_params.get("name")
         if name:
