@@ -13,6 +13,8 @@ from .serializers import (
     ProductSerializer,
     ReducedProductSerializer,
     CreateProductRequestSerializer,
+    UpdateProductRequestSerializer,
+    UpdateProductResponseSerializer,
 )
 
 
@@ -81,3 +83,34 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
         if self.action == "list":
             return ReducedProductSerializer
         return ProductSerializer
+    
+    def update(self, request, *args, **kwargs):
+        request_serializer = UpdateProductRequestSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
+
+        instance: Product = self.get_object()
+
+        # # TODO: See if there's a way to get this update logic into the request serializer
+        instance.name = request_serializer.validated_data["name"]
+        instance.description = request_serializer.validated_data["description"]
+        instance.price = request_serializer.validated_data["price"]
+        instance.stock = request_serializer.validated_data["stock"]
+        
+        new_category = get_category_by_id(request_serializer.validated_data["category_id"])
+        instance.category = new_category
+
+        # Delete existing images
+        for image_id in request_serializer.validated_data["deleted_image_ids"]:
+            print(f"Deleting image with id {str(image_id)}") #TODO: Do this on s3
+            Image.objects.filter(image_id=image_id).delete()
+
+        instance.save()
+
+        # Create new images
+        for _ in range(0, request_serializer.validated_data["new_image_count"]):
+            Image.objects.create(product=instance)
+
+        return Response(
+            data=ProductSerializer(instance).data,
+            status=status.HTTP_200_OK,
+        )

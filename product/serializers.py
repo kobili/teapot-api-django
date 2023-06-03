@@ -65,3 +65,25 @@ class CreateProductRequestSerializer(serializers.Serializer):
     stock = serializers.IntegerField()
     image_count = serializers.IntegerField()
     category_id = serializers.UUIDField()
+
+class UpdateProductRequestSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.FloatField()
+    stock = serializers.IntegerField()
+    new_image_count = serializers.IntegerField()
+    deleted_image_ids = serializers.ListField(
+        child=serializers.UUIDField(),
+        allow_empty=True,
+        max_length=5,
+    )
+    category_id = serializers.UUIDField()
+
+class UpdateProductResponseSerializer(ProductSerializer):
+    new_images = ImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "new_images",
+        ]
