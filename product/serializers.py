@@ -74,11 +74,19 @@ class CreateProductRequestSerializer(serializers.Serializer):
 
 
 class UpdateProductRequestSerializer(serializers.Serializer):
+    """
+    Serializer used to validated Update Product requests
+    """
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.FloatField()
     stock = serializers.IntegerField()
+
+    # Used when the client needs to add more images 
+    # (not update; they wouldn't need an API call for that)
     new_image_count = serializers.IntegerField()
+
+    # Used when the client needs to remove images
     deleted_image_ids = serializers.ListField(
         child=serializers.UUIDField(),
         allow_empty=True,
