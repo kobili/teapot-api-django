@@ -65,17 +65,24 @@ class ReducedProductSerializer(serializers.ModelSerializer):
 
 
 class CreateProductRequestSerializer(serializers.Serializer):
+    """
+    Serializer used to validate Create Product requests
+    """
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.FloatField()
     stock = serializers.IntegerField()
+
+    # The initial number of images to create
+    # the client can update these images as needed
+    # If they want to add more they'll have to call the update endpoint to provision more
     image_count = serializers.IntegerField()
     category_id = serializers.UUIDField()
 
 
 class UpdateProductRequestSerializer(serializers.Serializer):
     """
-    Serializer used to validated Update Product requests
+    Serializer used to validate Update Product requests
     """
     name = serializers.CharField()
     description = serializers.CharField()
