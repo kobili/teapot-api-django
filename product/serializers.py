@@ -45,6 +45,8 @@ class ReducedProductSerializer(serializers.ModelSerializer):
     """
     The serializer to be used when returning a limited amount of data for a Product
     """
+    image = ImageSerializer(read_only=True, source='first_image')
+
     class Meta:
         model = Product
         fields = [
@@ -52,6 +54,7 @@ class ReducedProductSerializer(serializers.ModelSerializer):
             'name',
             'price',
             'seller',
+            'image',
         ]
 
 

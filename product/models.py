@@ -23,6 +23,10 @@ class Product(models.Model):
             "seller_id": self.user.user_id,
             "name": f"{self.user.first_name} {self.user.last_name}",
         }
+    
+    @cached_property
+    def first_image(self):
+        return self.images.first()
 
 
 class Image(models.Model):
