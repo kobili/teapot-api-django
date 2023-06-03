@@ -1,7 +1,8 @@
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
+from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import APIException
 
 from users.utils import get_user_by_id
 from category.models import Category
@@ -10,6 +11,7 @@ from category.utils import get_category_by_id
 
 from .models import Product, Image
 from .serializers import (
+    ImageSerializer,
     ProductSerializer,
     ReducedProductSerializer,
     CreateProductRequestSerializer,
@@ -98,11 +100,6 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
         new_category = get_category_by_id(request_serializer.validated_data["category_id"])
         instance.category = new_category
 
-        # Delete existing images
-        for image_id in request_serializer.validated_data["deleted_image_ids"]:
-            print(f"Deleting image with id {str(image_id)}") #TODO: Do this on s3
-            Image.objects.filter(image_id=image_id).delete()
-
         instance.save()
 
         # Create new images
@@ -112,4 +109,37 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
         return Response(
             data=ProductSerializer(instance).data,
             status=status.HTTP_200_OK,
+        )
+
+
+class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+
+    def get_queryset(self):
+        product_id = self.kwargs["product_id"]
+        
+        queryset = self.queryset
+
+        product = Product.objects.filter(product_id=product_id).first()
+        if product:
+            queryset = queryset.filter(product=product)
+
+        return queryset
+
+    def create(self, *args, **kwargs):
+        product_id = kwargs["product_id"]
+        product = Product.objects.filter(product_id=product_id).first()
+
+        if not product:
+            raise APIException(
+                f"Could not find product with id {product_id}",
+                code=404,
+            )
+        
+        image = Image.objects.create(product=product)
+
+        return Response(
+            data=self.serializer_class(instance=image).data,
+            status=status.HTTP_201_CREATED,
         )

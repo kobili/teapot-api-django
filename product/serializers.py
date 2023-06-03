@@ -89,14 +89,4 @@ class UpdateProductRequestSerializer(serializers.Serializer):
     price = serializers.FloatField()
     stock = serializers.IntegerField()
 
-    # Used when the client needs to add more images 
-    # (not update; they wouldn't need an API call for that)
-    new_image_count = serializers.IntegerField()
-
-    # Used when the client needs to remove images
-    deleted_image_ids = serializers.ListField(
-        child=serializers.UUIDField(),
-        allow_empty=True,
-        max_length=5,
-    )
     category_id = serializers.UUIDField()
