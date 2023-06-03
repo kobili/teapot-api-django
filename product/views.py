@@ -103,10 +103,6 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
 
         instance.save()
 
-        # Create new images
-        for _ in range(0, request_serializer.validated_data["new_image_count"]):
-            Image.objects.create(product=instance)
-
         return Response(
             data=ProductSerializer(instance).data,
             status=status.HTTP_200_OK,
