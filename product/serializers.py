@@ -78,12 +78,3 @@ class UpdateProductRequestSerializer(serializers.Serializer):
         max_length=5,
     )
     category_id = serializers.UUIDField()
-
-class UpdateProductResponseSerializer(ProductSerializer):
-    new_images = ImageSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Product
-        fields = [
-            "new_images",
-        ]

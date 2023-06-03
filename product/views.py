@@ -14,7 +14,6 @@ from .serializers import (
     ReducedProductSerializer,
     CreateProductRequestSerializer,
     UpdateProductRequestSerializer,
-    UpdateProductResponseSerializer,
 )
 
 
