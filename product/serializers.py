@@ -5,18 +5,24 @@ from .models import Product, Image
 
 class ImageSerializer(serializers.ModelSerializer):
 
-    presigned_url = serializers.SerializerMethodField()
+    put_url = serializers.SerializerMethodField()
+    get_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Image
         fields = [
             "image_id",
-            "presigned_url"
+            "put_url",
+            "get_url",
         ]
 
-    def get_presigned_url(self, obj):
+    def get_put_url(self, obj):
         # TODO: Fetch presigned urls from here
-        return f"This will become a presigned url from s3 for the image {obj.image_id}"
+        return f"This will become a PUT presigned url from s3 for the image {obj.image_id}"
+    
+    def get_get_url(self, obj):
+        # TODO: Fetch presigned urls from here
+        return f"This will become a GET presigned url from s3 for the image {obj.image_id}"
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -65,6 +71,7 @@ class CreateProductRequestSerializer(serializers.Serializer):
     stock = serializers.IntegerField()
     image_count = serializers.IntegerField()
     category_id = serializers.UUIDField()
+
 
 class UpdateProductRequestSerializer(serializers.Serializer):
     name = serializers.CharField()
