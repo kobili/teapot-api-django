@@ -62,6 +62,7 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
     serializer_class = ProductSerializer
 
     def get_queryset(self, *args, **kwargs):
+        # TODO: for admins, allow unavailable products to be queried
         queryset = Product.objects.filter(is_available=True)
 
         name = self.request.query_params.get("name")
@@ -110,6 +111,13 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
             data=ProductSerializer(instance).data,
             status=status.HTTP_200_OK,
         )
+    
+    def destroy(self, request, *args, **kwargs):
+        instance: Product = self.get_object()
+        instance.is_available = False
+        instance.save(update_fields=["is_available"])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
