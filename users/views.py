@@ -6,6 +6,7 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
 from .models import AppUser
 from .serializers import AppUserSerializer, RegistrationSerializer, UpdateUserSerializer
+from .exceptions import UserNotFoundException
 
 
 # Create your views here.
@@ -29,7 +30,7 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user = UserModel.objects.create_user(serializer.validated_data.get("email"), serializer.validated_data.get("password"))
+        user: AppUser = UserModel.objects.create_user(serializer.validated_data.get("email"), serializer.validated_data.get("password"))
         
         user.first_name = serializer.validated_data.get("first_name")
         user.last_name = serializer.validated_data.get("last_name")
@@ -40,19 +41,15 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(response.data, status=status.HTTP_201_CREATED)
 
     # PUT users/{user_id}/
-    def update(self, request, pk=None):
+    def update(self, request, pk: str=None):
         serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        user = self._get_user_by_id(pk)
         
-        if self.queryset.filter(email=serializer.validated_data.get("email")).exists():
+        email = serializer.validated_data.get("email")
+        
+        if not user.email == email and self.queryset.filter(email=email).exists():
             return Response(
                 {"error": "User with email '{}' already exists".format(serializer.validated_data.get("email"))},
                 status=status.HTTP_400_BAD_REQUEST
@@ -67,14 +64,8 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         response = self.serializer_class(user)
         return Response(response.data, status=status.HTTP_200_OK)
     
-    def destroy(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+    def destroy(self, request, pk: str=None):
+        user = self._get_user_by_id(pk)
         
         user.is_active = False
         user.save()
@@ -82,14 +73,8 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def restore(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+    def restore(self, request, pk: str=None):
+        user = self._get_user_by_id(pk)
         
         user.is_active = True
         user.save()
@@ -97,14 +82,8 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def promote(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+    def promote(self, request, pk: str=None):
+        user = self._get_user_by_id(pk)
         
         user.is_staff = True
         user.save()
@@ -112,16 +91,16 @@ class AppUserViewSet(GenericViewSet, ListModelMixin, RetrieveModelMixin):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(methods=["PUT"], detail=True)
-    def demote(self, request, pk=None):
-        user = self.queryset.get(user_id=pk)
-
-        if not user:
-            return Response(
-                {"error": "Could not find user {}".format(pk)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+    def demote(self, request, pk: str=None):
+        user = self._get_user_by_id(pk)
         
         user.is_staff = False
         user.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def _get_user_by_id(self, pk: str=None) -> AppUser:
+        try:
+            return self.get_queryset().get(user_id=pk)
+        except AppUser.DoesNotExist:
+            raise UserNotFoundException(user_id=pk)

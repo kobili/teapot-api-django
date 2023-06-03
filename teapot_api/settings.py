@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'payment',
     'banking',
     'category',
+    'product',
 ]
 
 MIDDLEWARE = [
