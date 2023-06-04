@@ -2,6 +2,8 @@ from rest_framework import serializers
 from category.serializers import CategorySerializer
 from .models import Product, Image
 
+from .s3_client import get_s3_object, create_s3_object
+
 
 class ImageSerializer(serializers.ModelSerializer):
 
@@ -17,12 +19,10 @@ class ImageSerializer(serializers.ModelSerializer):
         ]
 
     def get_put_url(self, obj):
-        # TODO: Fetch presigned urls from here
-        return f"This will become a PUT presigned url from s3 for the image {obj.image_id}"
+        return create_s3_object(str(obj.image_id))
     
     def get_get_url(self, obj):
-        # TODO: Fetch presigned urls from here
-        return f"This will become a GET presigned url from s3 for the image {obj.image_id}"
+        return get_s3_object(str(obj.image_id))
 
 
 class ProductSerializer(serializers.ModelSerializer):
