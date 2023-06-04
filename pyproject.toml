@@ -12,6 +12,8 @@ django = "^4.2.1"
 djangorestframework = "^3.14.0"
 psycopg2 = "^2.9.6"
 django-cryptography = "^1.1"
+boto3 = "^1.26.146"
+python-dotenv = "^1.0.0"
 
 
 [build-system]
