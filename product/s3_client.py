@@ -1,13 +1,12 @@
 import boto3
 import logging
-from uuid import uuid4
 from botocore.exceptions import ClientError
 
 from teapot_api.settings import S3_BUCKET
 
 _s3_client = boto3.client(
     's3', 
-    endpoint_url="https://0.0.0.0:4566",
+    endpoint_url="https://0.0.0.0:4566",    # TODO: replace this when trying to actualy access s3
     aws_access_key_id="localstack_placeholder",
     aws_secret_access_key="localstack_placeholder",
 )
