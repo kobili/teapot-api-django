@@ -11,8 +11,10 @@ from category.utils import get_category_by_id
 
 from .models import Product, Image
 from .serializers import (
-    ImageSerializer,
+    GetImageSerializer,
+    UpdateImageSerializer,
     ProductSerializer,
+    CreateProductSerializer,
     ReducedProductSerializer,
     CreateProductRequestSerializer,
     UpdateProductRequestSerializer,
@@ -27,6 +29,11 @@ class UserProductViewSet(GenericViewSet):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
+        return self.serializer_class
+    
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreateProductSerializer
         return self.serializer_class
     
     def create(self, request, user_id: str = None):
@@ -52,7 +59,7 @@ class UserProductViewSet(GenericViewSet):
         for _ in range(0, num_images):
             Image.objects.create(product=new_product)
 
-        response_serializer = ProductSerializer(instance=new_product)
+        response_serializer = self.get_serializer_class()(instance=new_product)
 
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
 
@@ -118,7 +125,7 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
 
 class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
     queryset = Image.objects.all()
-    serializer_class = ImageSerializer
+    serializer_class = GetImageSerializer
 
     def get_queryset(self):
         product_id = self.kwargs["product_id"]
@@ -130,6 +137,11 @@ class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
             queryset = queryset.filter(product=product)
 
         return queryset
+    
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action in ["create", "update"]:
+            return UpdateImageSerializer
+        return self.serializer_class
 
     def create(self, *args, **kwargs):
         product_id = kwargs["product_id"]
@@ -144,6 +156,13 @@ class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
         image = Image.objects.create(product=product)
 
         return Response(
-            data=self.serializer_class(instance=image).data,
+            data=self.get_serializer_class()(instance=image).data,
             status=status.HTTP_201_CREATED,
         )
+    
+    def update(self, *args, **kwargs):
+        image = self.get_object()
+
+        serializer = self.get_serializer_class()(instance=image)
+
+        return Response(serializer.data, status.HTTP_200_OK)
