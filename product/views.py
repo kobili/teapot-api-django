@@ -11,7 +11,8 @@ from category.utils import get_category_by_id
 
 from .models import Product, Image
 from .serializers import (
-    ImageSerializer,
+    GetImageSerializer,
+    UpdateImageSerializer,
     ProductSerializer,
     ReducedProductSerializer,
     CreateProductRequestSerializer,
@@ -19,6 +20,7 @@ from .serializers import (
 )
 
 
+# TODO: Remove images from product responses; they will be returned from separate API calls
 class UserProductViewSet(GenericViewSet):
     """
     View set to handle requests from /users/<user_id>/product/
@@ -118,7 +120,7 @@ class ProductViewSet(GenericViewSet, RetrieveModelMixin, ListModelMixin):
 
 class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
     queryset = Image.objects.all()
-    serializer_class = ImageSerializer
+    serializer_class = GetImageSerializer
 
     def get_queryset(self):
         product_id = self.kwargs["product_id"]
@@ -130,6 +132,11 @@ class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
             queryset = queryset.filter(product=product)
 
         return queryset
+    
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action in ["create", "update"]:
+            return UpdateImageSerializer
+        return self.serializer_class
 
     def create(self, *args, **kwargs):
         product_id = kwargs["product_id"]
@@ -144,6 +151,13 @@ class ImageViewSet(GenericViewSet, RetrieveModelMixin, DestroyModelMixin):
         image = Image.objects.create(product=product)
 
         return Response(
-            data=self.serializer_class(instance=image).data,
+            data=self.get_serializer_class()(instance=image).data,
             status=status.HTTP_201_CREATED,
         )
+    
+    def update(self, *args, **kwargs):
+        image = self.get_object()
+
+        serializer = self.get_serializer_class()(instance=image)
+
+        return Response(serializer.data, status.HTTP_200_OK)

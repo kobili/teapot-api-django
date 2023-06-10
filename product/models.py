@@ -28,7 +28,7 @@ class Product(models.Model):
     def first_image(self):
         return self.images.first()
 
-
+# TODO: Need to move images to a subfolder and move image functionality from product to its own app
 class Image(models.Model):
     image_id = models.UUIDField(primary_key=True, default=uuid4)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
