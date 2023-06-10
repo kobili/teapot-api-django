@@ -4,19 +4,13 @@
 - Python (v3.10+)
 - Docker
 
-## Starting a Postgres DB in a Docker Container
-- Create the containers:
+## Starting backend server dependencies
+The backend depends on Docker containers which run Postgres and Localstack
+- Run the containers using the command:
+    ```shell
+    make start-db
     ```
-    make build
-    ```
-- Start the containers:
-    ```
-    make start
-    ```
-- Stop the containers:
-    ```
-    make stop
-    ```
+    - Exit the containers with `CTRL + c`
 
 ## Installing Dependencies
 ```
