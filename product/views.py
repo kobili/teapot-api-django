@@ -21,7 +21,6 @@ from .serializers import (
 )
 
 
-# TODO: Remove images from product responses; they will be returned from separate API calls
 class UserProductViewSet(GenericViewSet):
     """
     View set to handle requests from /users/<user_id>/product/
