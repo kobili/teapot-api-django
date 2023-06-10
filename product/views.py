@@ -14,6 +14,7 @@ from .serializers import (
     GetImageSerializer,
     UpdateImageSerializer,
     ProductSerializer,
+    CreateProductSerializer,
     ReducedProductSerializer,
     CreateProductRequestSerializer,
     UpdateProductRequestSerializer,
@@ -29,6 +30,11 @@ class UserProductViewSet(GenericViewSet):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
+        return self.serializer_class
+    
+    def get_serializer_class(self):
+        if self.action == "create":
+            return CreateProductSerializer
         return self.serializer_class
     
     def create(self, request, user_id: str = None):
@@ -54,7 +60,7 @@ class UserProductViewSet(GenericViewSet):
         for _ in range(0, num_images):
             Image.objects.create(product=new_product)
 
-        response_serializer = ProductSerializer(instance=new_product)
+        response_serializer = self.get_serializer_class()(instance=new_product)
 
         return Response(data=response_serializer.data, status=status.HTTP_201_CREATED)
 

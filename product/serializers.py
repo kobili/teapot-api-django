@@ -55,6 +55,13 @@ class ProductSerializer(serializers.ModelSerializer):
             'is_available',
         ]
 
+class CreateProductSerializer(ProductSerializer):
+    """
+    The serializer used to serializer create Product responses
+    The images array includes PutObject urls
+    """
+    images = UpdateImageSerializer(many=True, read_only=True)
+
 
 class ReducedProductSerializer(serializers.ModelSerializer):
     """
